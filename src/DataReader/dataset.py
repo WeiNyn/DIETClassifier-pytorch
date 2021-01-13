@@ -61,7 +61,7 @@ class DIETClassifierDataset:
             input_ids=self.data["input_ids"][index],
             token_type_ids=self.data["token_type_ids"][index],
             attention_mask=self.data["attention_mask"][index],
-            offset_mapping=self.data["offset_mapping"][index],
+            # offset_mapping=self.data["offset_mapping"][index],
             entities_labels=self.data["entities_labels"][index],
             intent_labels=self.data["intent_labels"][index]
         )
