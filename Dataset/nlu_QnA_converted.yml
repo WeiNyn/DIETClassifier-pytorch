@@ -1,0 +1,215 @@
+version: "2.0"
+nlu:
+- intent: WorkTimesBreaches
+  examples: |
+    - What is late in and early out?
+    - what is late-in?
+    - what is late-in and early-out?
+    - what is early-out?
+    - What is early out?
+    - How about coming late to work?
+    - Late in?
+    - late-in?
+    - early out?
+    - early-out?
+- intent: WorkingTimeBreachDiscipline
+  examples: |
+    - What if I have late-in record?
+    - What if I have early-out record?
+    - What if I late-in
+    - What if I late in
+    - What if I come late
+    - What if I early-out
+    - What if I early out
+    - What if I come home early
+    - How many time can I early-out
+    - How many time can I late-in
+    - How many time can I early-out and late-in
+    - How many time can I late in
+- intent: HolidaysOff
+  examples: |
+    - How many holidays a year
+    - Can I get information about holidays
+    - Do we have holidays?
+    - What is the time for new year vacation
+    - How about lunar new year vacation
+    - lunar new year
+    - new year vacation
+    - Hung king day
+    - holiday
+    - vacation
+    - I want to know about holiday of years
+    - How many holiday in a year
+- intent: AnnualLeaveApplicationProcess
+  examples: |
+    - How about annual leave?
+    - annual leave?
+    - annual leave process
+    - How about annual leave process
+    - How about annual leave application process
+- intent: SetWorkingType
+  examples: |
+    - I work on [office hours](working_type)
+    - I work on [office hour]{"entity": "working_type", "value": "office hours"}
+    - I'm working on [office hours](working_type)
+    - I'm working on [office hour]{"entity": "working_type", "value": "office hours"}
+    - I work on [shift](working_type)
+    - I'm working on [shift](working_type)
+    - I am working on [office hours](working_type)
+    - I am working on [office hour]{"entity": "working_type", "value": "office hours"}
+    - on [shift](working_type)
+    - on [office hours](working_type)
+    - [shift](working_type)
+    - [office hours](working_type)
+    - oh, I work on [office hours](working_type)
+    - how about working on [shift](working_type)
+    - today
+- intent: TemporarySetWorkingType
+  examples: |
+    - How about [office hours](working_type)
+    - How about [office hour]{"entity": "working_type", "value": "office hours"}
+    - How about [shift](working_type)
+    - What if I work on [office hours](working_type)
+    - What if I work on [office hour]{"entity": "working_type", "value": "office hours"}
+    - What if I work on [shift](working_type)
+    - how about work on [shift](working_type)
+    - how about [office hours](working_type)
+    - how about [shift](working_type)
+- intent: WorkingHours
+  examples: |
+    - What are average working hours per day?
+    - Average working hours per day?
+    - What are average woring hours per week?
+    - Average working hours per week?
+    - What are average woring hours per month?
+    - Average working hours per month?
+    - How about working time?
+    - Working time?
+    - What is office-working time?
+    - Can you tell me about working time?
+    - I want to know about working hours
+    - About working hours
+    - Working time in day
+    - working hours
+    - how about [office](working_type) working hours
+    - how about [office hours](working_type) working time ?
+    - How about working hours
+    - about working hours
+    - how about working hours
+    - so, what is the average working hours
+- intent: WorkingDay
+  examples: |
+    - How many work day per week?
+    - About off day of week?
+    - off day?
+    - Working day of week?
+- intent: BreakTime
+  examples: |
+    - What is break time?
+    - Do we have break time?
+    - How about break time?
+    - When do we have lunch
+    - When can I break
+    - Break time?
+    - Can I sleep?
+    - how about break time ?
+    - When do I have break time
+    - about break time
+    - When do we have break time
+    - how about break time
+- intent: Pregnant
+  examples: |
+    - Working time for pregnant employee?
+    - I'm pregnant?
+    - Will this change when I'm pregnant
+    - but I am pregnant
+    - How about pregnant employee
+    - Working time for pregnant employees
+    - pregnant
+    - pregnant policy
+    - Do this thing change when I'm pregnant
+    - I'm pregnant
+- intent: AttendanceRecord
+  examples: |
+    - How about attendence record?
+    - About checking attendence?
+    - How to check attendence?
+    - How can I check attendence?
+    - I mean check attendace
+    - I want to know about attendance record
+    - About attendance recorded
+    - How to check attendance
+- intent: SelectShiftType
+  examples: |
+    - [day shift](shift_type)
+    - [afternoon shift](shift_type)
+    - [night shift](shift_type)
+    - [night shift](shift_type) please
+    - [afternoon shift](shift_type) please
+- intent: LaborContract
+  examples: |
+    - how about labor contract
+    - labor contract
+    - time for definite labor contract
+    - time for indefinite labor contract
+    - Time for indefinite labor contract
+- intent: Recruitment
+  examples: |
+    - How about recruitment policy
+    - recruitment process
+- intent: SickLeave
+  examples: |
+    - How about sick leave
+    - Sick leave
+    - How many day of sick leave
+    - What if I got a cold
+    - Will I get paid for sick leave
+    - How to get paid for sick leave
+- intent: UnpaidLeave
+  examples: |
+    - How many unpaid leave can I get
+    - Can I leave after using all of my annual leave day
+    - Unpaid leave
+    - How about unpaid leave
+    - unpaid leave please
+    - Can I leave after using all of my annual leave day
+    - Can I leave after using all of my annual leave day
+- intent: PaidLeaveForFamilyEvent
+  examples: |
+    - Can I leave for family events
+    - Did I get paid for my family events
+    - Will I get paid for my family events
+    - Will I get paid for Marriage
+    - Will I get paid for the dead of family member
+    - Can I leave for my Marriage
+    - Can I get paid for family event off
+- intent: UnusedAnnualLeave
+  examples: |
+    - What can I do with my unused annual leave day
+    - What can I do with my unused day
+    - Can I exchange my annual leave day
+    - How can I use my unused annual leave day
+    - what can I do with my unused annual leave day
+    - What can I do with my unused annual leave
+- intent: RegulatedAnnualLeave
+  examples: |
+    - How many annual leave for employee?
+    - How about number of annual leave day?
+    - How many off day I have each year?
+    - Annual leave day in year
+    - Annual leave days
+    - how many annual leave day each year
+    - how many annual leave
+    - how about annual leave day
+    - How many annual leave I have
+- synonym: office hours
+  examples: |
+    - office hour
+    - office
+- intent: rating
+  examples: |
+    - [1](number)
+    - [2](number)
+    - [3](number)
+    - [4](number)
+    - [5](number)

@@ -1,0 +1,10 @@
+model: dslim/bert-base-NER
+entities:
+  - working type
+  - shift type
+intents:
+  - first
+  - second
+  - third
+  - fourth
+  - fifth
