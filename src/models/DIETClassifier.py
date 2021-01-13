@@ -70,6 +70,7 @@ class DIETClassifier(BertPreTrainedModel):
             entities_loss_fct = CrossEntropyLoss()
             # Only keep active parts of the loss
             if attention_mask is not None:
+                print("attention_mask", attention_mask.shape)
                 active_loss = attention_mask[1:].view(-1) == 1
                 active_logits = entities_logits.view(-1, self.num_entities)
                 print("active_loss", active_loss.shape)
