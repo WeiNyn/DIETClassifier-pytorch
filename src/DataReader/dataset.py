@@ -39,10 +39,11 @@ class DIETClassifierDataset:
             entities_labels = []
             for offset in sentences["offset_mapping"][index][1:]:
                 is_label = False
-                for entity in sentences["entities"][index]:
-                    if entity["position"][0] <= offset[0] and entity["position"][1] >= offset[1] and offset != (0, 0):
-                        entities_labels.append(self.entities.index(entity["entity_name"]))
-                        is_label = True
+                if offset[0] != 0 and offset[1] != 0:
+                    for entity in sentences["entities"][index]:
+                        if entity["position"][0] <= offset[0] and entity["position"][1] >= offset[1]:
+                            entities_labels.append(self.entities.index(entity["entity_name"]))
+                            is_label = True
                 if not is_label:
                     entities_labels.append(self.entities.index("O"))
 
