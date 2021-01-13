@@ -93,7 +93,7 @@ class DIETClassifier(BertPreTrainedModel):
 
         if not return_dict:
             output = (entities_logits, intent_logits,) + outputs[2:]
-            return ((loss,) + output) if ((entities_loss is not None) and (intent_loss is not None)) else output
+            return ((entities_loss, intent_loss, ) + output) if ((entities_loss is not None) and (intent_loss is not None)) else output
 
         return dict(
             loss=loss,
