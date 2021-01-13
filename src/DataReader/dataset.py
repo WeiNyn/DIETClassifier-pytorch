@@ -39,7 +39,7 @@ class DIETClassifierDataset:
             entities_labels = []
             for offset in sentences["offset_mapping"][index][1:]:
                 is_label = False
-                if offset[0] != 0 and offset[1] != 0:
+                if not (offset[0] == 0 and offset[1] == 0):
                     for entity in sentences["entities"][index]:
                         if entity["position"][0] <= offset[0] and entity["position"][1] >= offset[1]:
                             entities_labels.append(self.entities.index(entity["entity_name"]))
@@ -86,5 +86,7 @@ if __name__ == "__main__":
     dataset = DIETClassifierDataset(dataframe=df, tokenizer=tokenizer, entities=entities_list, intents=intents_list)
 
     print(len(dataset))
-    print(dataset[1])
+    print(dataset[120])
+    print(dataset.data["entities"][120])
+    print(dataset.data["offset_mapping"][120])
 
