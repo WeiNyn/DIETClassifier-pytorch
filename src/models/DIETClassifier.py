@@ -89,7 +89,7 @@ class DIETClassifier(BertPreTrainedModel):
                 intent_loss_fct = CrossEntropyLoss()
                 intent_loss = intent_loss_fct(intent_logits.view(-1, self.num_intents), intent_labels.view(-1))
 
-        loss = entities_loss + intent_loss
+        loss = entities_loss*0.3 + intent_loss*0.7
 
         if not return_dict:
             output = (entities_logits, intent_logits,) + outputs[2:]
