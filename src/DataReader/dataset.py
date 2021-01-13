@@ -37,7 +37,7 @@ class DIETClassifierDataset:
 
         for index in range(len(sentences["sentence"])):
             entities_labels = []
-            for offset in sentences["offset_mapping"][index]:
+            for offset in sentences["offset_mapping"][index][1:]:
                 is_label = False
                 for entity in sentences["entities"][index]:
                     if entity["position"][0] >= offset[0] and entity["position"][1] <= offset[1]:
