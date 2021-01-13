@@ -73,7 +73,7 @@ class DIETClassifier(BertPreTrainedModel):
                 active_loss = attention_mask.view(-1) == 1
                 active_logits = entities_logits.view(-1, self.num_entities)
                 active_labels = torch.where(
-                    active_loss, entities_labels.view(-1),
+                    active_loss[1:], entities_labels.view(-1),
                     torch.tensor(entities_loss_fct.ignore_index).type_as(entities_labels)
                 )
                 entities_loss = entities_loss_fct(active_logits, active_labels)
