@@ -3,10 +3,10 @@ from typing import List
 import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
-from transformers import BertForTokenClassification, BertPretrainedModel
+from transformers import BertForTokenClassification, BertPreTrainedModel
 
 
-class DIETClassifier(BertPretrainedModel):
+class DIETClassifier(BertPreTrainedModel):
     def __init__(self, model: str, entities: List[str], intents: List[str]):
         pretrained_model = BertForTokenClassification.from_pretrained(model)
         config = pretrained_model.config
@@ -56,14 +56,14 @@ class DIETClassifier(BertPretrainedModel):
             return_dict=return_dict,
         )
 
-        sequence_output = outputs[0][1:]
+        sequence_output = outputs[0][:, 1:]
         sequence_output = self.dropout(sequence_output)
 
-        pooled_output = outputs[1]
+        pooled_output = outputs[0][:, :1]
         pooled_output = self.dropout(pooled_output)
 
-        entities_logits = self.classifier(sequence_output)
-        intent_logits = self.classifier(pooled_output)
+        entities_logits = self.entities_classifier(sequence_output)
+        intent_logits = self.intents_classifier(pooled_output)
 
         entities_loss = None
         if entities_labels is not None:
