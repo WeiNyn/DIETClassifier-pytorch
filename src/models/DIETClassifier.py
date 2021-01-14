@@ -127,3 +127,29 @@ class DIETClassifier(BertPreTrainedModel):
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
+
+
+if __name__ == '__main__':
+    import os
+    import sys
+
+    sys.path.append(os.getcwd())
+
+    from src.DataReader.DataReader import make_dataframe
+    from src.DataReader.dataset import DIETClassifierDataset
+    from transformers import AutoTokenizer
+
+    files = ["Dataset/nlu_QnA_converted.yml", "Dataset/nlu_QnA_converted.yml"]
+    tokenizer = AutoTokenizer.from_pretrained("dslim/bert-base-NER")
+
+    df, entities_list, intents_list = make_dataframe(files)
+    dataset = DIETClassifierDataset(dataframe=df, tokenizer=tokenizer, entities=entities_list, intents=intents_list)
+
+    model = DIETClassifier(model="dslim/bert-base-NER", entities=entities_list, intents=intents_list)
+
+    sentences = ["What if I'm late"]
+
+    inputs = tokenizer(sentences, return_tensors="pt", padding="max_length", max_length=512)
+    outputs = model(**{k: v for k, v in inputs.items()})
+
+    print(outputs)
