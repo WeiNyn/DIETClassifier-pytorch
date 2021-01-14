@@ -8,6 +8,13 @@ from transformers import BertForTokenClassification, BertPreTrainedModel
 
 class DIETClassifier(BertPreTrainedModel):
     def __init__(self, model: str, entities: List[str], intents: List[str]):
+        """
+        Create DIETClassifier model
+
+        :param model: name of huggingface model (BERT base only)
+        :param entities: list of entities class names
+        :param intents: list of intents class name
+        """
         pretrained_model = BertForTokenClassification.from_pretrained(model)
         config = pretrained_model.config
         super().__init__(config)
@@ -37,10 +44,21 @@ class DIETClassifier(BertPreTrainedModel):
             output_hidden_states=None,
             return_dict=None,
     ):
-        r"""
-        labels (:obj:`torch.LongTensor` of shape :obj:`(batch_size, sequence_length)`, `optional`):
-            Labels for computing the token classification loss. Indices should be in ``[0, ..., config.num_labels -
-            1]``.
+        """
+        training model if entities_labels and intent_labels are passed, else inference
+
+        :param input_ids: embedding ids of tokens
+        :param attention_mask: attention_mask
+        :param token_type_ids: token_type_ids
+        :param position_ids: position_ids (optional)
+        :param head_mask: head_mask (optional)
+        :param inputs_embeds: inputs_embeds (optional)
+        :param intent_labels: labels of intent
+        :param entities_labels: labels of entities
+        :param output_attentions: return attention weight or not
+        :param output_hidden_states: return hidden_states or not
+        :param return_dict: return dictionary or not
+        :return:
         """
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
@@ -89,7 +107,10 @@ class DIETClassifier(BertPreTrainedModel):
                 intent_loss_fct = CrossEntropyLoss()
                 intent_loss = intent_loss_fct(intent_logits.view(-1, self.num_intents), intent_labels.view(-1))
 
-        loss = entities_loss*0.1 + intent_loss*0.9
+        if (entities_labels is not None) and (intent_labels is not None):
+            loss = entities_loss*0.1 + intent_loss*0.9
+        else:
+            loss = None
 
         if self.training:
             return_dict = True
