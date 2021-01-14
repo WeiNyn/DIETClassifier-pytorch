@@ -1,26 +1,28 @@
-from typing import List
+from typing import Dict, Any, List
 
 import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
 from transformers import BertForTokenClassification, BertPreTrainedModel
+from transformers.configuration_utils import PretrainedConfig
 
 
 class DIETClassifier(BertPreTrainedModel):
-    def __init__(self, model: str, entities: List[str], intents: List[str]):
+    def __init__(self, config: PretrainedConfig):
         """
         Create DIETClassifier model
 
-        :param model: name of huggingface model (BERT base only)
-        :param entities: list of entities class names
-        :param intents: list of intents class name
+        :param config: config for model
         """
-        pretrained_model = BertForTokenClassification.from_pretrained(model)
-        config = pretrained_model.config
+        pretrained_model = BertForTokenClassification.from_pretrained(config.model)
+        config.update(pretrained_model.config.__dict__)
+        # pretrained_model.config.__dict__.update(config.__dict__)
+        # config = pretrained_model.config
         super().__init__(config)
-        self.entities_list = ["O"] + entities
+
+        self.entities_list = ["O"] + config.entities
         self.num_entities = len(self.entities_list)
-        self.intents_list = intents
+        self.intents_list = config.intents
         self.num_intents = len(self.intents_list)
 
         self.bert = pretrained_model.bert
@@ -108,7 +110,7 @@ class DIETClassifier(BertPreTrainedModel):
                 intent_loss = intent_loss_fct(intent_logits.view(-1, self.num_intents), intent_labels.view(-1))
 
         if (entities_labels is not None) and (intent_labels is not None):
-            loss = entities_loss*0.1 + intent_loss*0.9
+            loss = entities_loss * 0.1 + intent_loss * 0.9
         else:
             loss = None
 
@@ -145,7 +147,8 @@ if __name__ == '__main__':
     df, entities_list, intents_list = make_dataframe(files)
     dataset = DIETClassifierDataset(dataframe=df, tokenizer=tokenizer, entities=entities_list, intents=intents_list)
 
-    model = DIETClassifier(model="dslim/bert-base-NER", entities=entities_list, intents=intents_list)
+    config = PretrainedConfig.from_dict(dict(model="dslim/bert-base-NER",entities=entities_list, intents=intents_list))
+    model = DIETClassifier(config=config)
 
     sentences = ["What if I'm late"]
 
@@ -153,3 +156,4 @@ if __name__ == '__main__':
     outputs = model(**{k: v for k, v in inputs.items()})
 
     print(outputs)
+

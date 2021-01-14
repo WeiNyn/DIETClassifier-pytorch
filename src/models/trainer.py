@@ -49,6 +49,7 @@ if __name__ == '__main__':
     from src.DataReader.dataset import DIETClassifierDataset
     from src.models.DIETClassifier import DIETClassifier
     from transformers import AutoTokenizer
+    from transformers.configuration_utils import PretrainedConfig
 
     files = ["Dataset/nlu_QnA_converted.yml", "Dataset/nlu_QnA_converted.yml"]
     tokenizer = AutoTokenizer.from_pretrained("dslim/bert-base-NER")
@@ -56,7 +57,8 @@ if __name__ == '__main__':
     df, entities_list, intents_list = make_dataframe(files)
     dataset = DIETClassifierDataset(dataframe=df, tokenizer=tokenizer, entities=entities_list, intents=intents_list)
 
-    model = DIETClassifier(model="dslim/bert-base-NER", entities=entities_list, intents=intents_list)
+    config = PretrainedConfig.from_dict(dict(model="dslim/bert-base-NER", entities=entities_list, intents=intents_list))
+    model = DIETClassifier(config=config)
 
     sentences = ["What if I'm late"]
 
