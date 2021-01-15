@@ -1,4 +1,5 @@
-from typing import List, Dict, Text, Any
+import json
+from typing import List, Dict, Text, Any, Union
 
 import pandas as pd
 import torch
@@ -14,8 +15,12 @@ class DIETClassifierDataset:
         :param entities: list of entities class names
         :param intents: list of intents class names
         """
-        self.tokenizer = tokenizer
+        dataframe = dataframe[dataframe["intent"].isin(intents)]
+
         self.entities = ["O"] + entities
+        dataframe["entities"] = dataframe["entities"].append(self._remove_entities)
+
+        self.tokenizer = tokenizer
         self.num_entities = len(self.entities)
         self.intents = intents
         self.num_intents = len(intents)
@@ -67,6 +72,17 @@ class DIETClassifierDataset:
         )
 
         return item
+
+    def _remove_entities(self, entities_list: Union[str, List[Dict[str, Any]]]) -> List[Dict[str, Any]]:
+        if isinstance(entities_list, str):
+            try:
+                entities_list = json.loads(entities_list)
+            except Exception as ex:
+                raise RuntimeError(f"Cannot convert entity {entities_list} by error: {ex}")
+
+        entities_list = [entity for entity in entities_list if entity["entity_name"] in self.entities]
+
+        return entities_list
 
 
 if __name__ == "__main__":
