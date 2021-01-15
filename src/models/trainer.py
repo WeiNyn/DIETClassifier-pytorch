@@ -1,7 +1,7 @@
 from typing import Optional
 
 from transformers import Trainer, TrainingArguments, EarlyStoppingCallback
-from trainsformers.integrations import TensorBoardCallback
+from transformers.integrations import TensorBoardCallback
 from torch.utils.data import random_split
 import torch
 
