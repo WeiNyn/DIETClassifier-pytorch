@@ -18,7 +18,7 @@ class DIETClassifierDataset:
         dataframe = dataframe[dataframe["intent"].isin(intents)]
 
         self.entities = ["O"] + entities
-        dataframe["entities"] = dataframe["entities"].append(self._remove_entities)
+        dataframe["entities"] = dataframe["entities"].apply(self._remove_entities)
 
         self.tokenizer = tokenizer
         self.num_entities = len(self.entities)
