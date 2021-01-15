@@ -1,10 +1,4 @@
 model: dslim/bert-base-NER
-entities:
-  - working type
-  - shift type
-intents:
-  - first
-  - second
-  - third
-  - fourth
-  - fifth
+folder: Dataset
+exclude_file:
+num_train_epochs: 100
