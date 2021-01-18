@@ -159,6 +159,7 @@ class DIETClassifierWrapper:
                               early_stopping_threshold=self.training_config["early_stopping_threshold"],
                               output_dir=self.training_config["output_dir"])
 
+        trainer.train()
         self.save_pretrained(save_name)
 
 

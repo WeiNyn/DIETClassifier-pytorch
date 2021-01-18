@@ -20,6 +20,7 @@ class DIETClassifierConfig(PretrainedConfig):
         self.hidden_dropout_prob = None
         self.hidden_size = None
 
+
 class DIETClassifier(BertPreTrainedModel):
     def __init__(self, config: DIETClassifierConfig):
         """
@@ -43,7 +44,9 @@ class DIETClassifier(BertPreTrainedModel):
         else:
             pretrained_model = BertForTokenClassification.from_pretrained(config.model)
             checkpoint = None
-            pretrained_model.config.update(config.__dict__)
+            if config.intents is None or config.entities is None:
+                raise ValueError(f"Using pretrained from transformers should specific entities and intents")
+            pretrained_model.config.update({"model": config.model, "entities": config.entities, "intents": config.intents})
             config = pretrained_model.config
 
         super().__init__(config)
