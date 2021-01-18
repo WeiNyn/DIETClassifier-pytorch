@@ -27,7 +27,7 @@ model:
     - UnusedAnnualLeave
     - RegulatedAnnualLeave
     - rating
-  device: cpu
+  device: cuda
 training:
   train_range: 0.95
   num_train_epochs: 100

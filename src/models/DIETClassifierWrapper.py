@@ -136,7 +136,7 @@ class DIETClassifierWrapper:
         self.model.save_pretrained(directory)
         self.tokenizer.save_pretrained(directory)
 
-    def train_model(self, save_name: str = "latest_model"):
+    def make_trainer(self):
         dataset_folder = self.dataset_config["dataset_folder"]
         if not path.exists(dataset_folder):
             raise ValueError(f"Folder {dataset_folder} is not exists")
@@ -159,8 +159,7 @@ class DIETClassifierWrapper:
                               early_stopping_threshold=self.training_config["early_stopping_threshold"],
                               output_dir=self.training_config["output_dir"])
 
-        trainer.train()
-        self.save_pretrained(save_name)
+        return trainer
 
 
 if __name__ == "__main__":
@@ -170,7 +169,9 @@ if __name__ == "__main__":
 
     print(wrapper.predict(["What is the average working hours"]))
 
-    wrapper.train_model()
+    trainer = wrapper.make_trainer()
+
+    trainer.train()
 
     print(wrapper.predict(["What is the average working hours"]))
 
