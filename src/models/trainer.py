@@ -70,6 +70,8 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained("dslim/bert-base-NER")
 
     df, entities_list, intents_list = make_dataframe(files)
+    entities_list = [entity for entity in entities_list if entity != "number"]
+    print(f"ENTITIES_LIST: {entities_list}")
     dataset = DIETClassifierDataset(dataframe=df, tokenizer=tokenizer, entities=entities_list, intents=intents_list)
 
     config = PretrainedConfig.from_dict(dict(model="dslim/bert-base-NER", entities=entities_list, intents=intents_list))

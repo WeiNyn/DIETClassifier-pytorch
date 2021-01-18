@@ -25,8 +25,12 @@ class DIETClassifierWrapper:
 
         self.dataset_config = model_config_dict
 
+        if model_config_dict["device"] is not None:
+            self.device = torch.device(model_config_dict["device"]) if torch.cuda.is_available() else torch.device(
+                "cpu")
+
         model_config_attributes = ["model", "intents", "entities"]
-        model_config_dict = {k: v for k, v in model_config_dict if k in model_config_attributes}
+        model_config_dict = {k: v for k, v in model_config_dict.items() if k in model_config_attributes}
 
         self.intents = model_config_dict["intents"]
         self.entities = model_config_dict["entities"]
@@ -38,12 +42,8 @@ class DIETClassifierWrapper:
             raise ValueError(f"Config file should have 'training' attribute")
 
         self.training_config = training_config_dict
-        self.tokenizer = AutoTokenizer(self.model_config.model)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_config.model)
         self.model = DIETClassifier(config=self.model_config)
-
-        if model_config_dict["device"] is not None:
-            self.device = torch.device(model_config_dict["device"]) if torch.cuda.is_available() else torch.device(
-                "cpu")
 
         self.model.to(self.device)
 
@@ -55,7 +55,7 @@ class DIETClassifierWrapper:
                                 padding=True, truncation=True)
 
         offset_mapping = inputs["offset_mapping"]
-        inputs = {k: v.to(self.device) for k, v in inputs.items() if k != offset_mapping}
+        inputs = {k: v.to(self.device) for k, v in inputs.items() if k != "offset_mapping"}
 
         return inputs, offset_mapping
 
@@ -96,6 +96,8 @@ class DIETClassifierWrapper:
             latest_entity = None
             for word, token_offset in zip(sentence, offset[1:]):
                 max_probability = torch.argmax(word)
+                print(max_probability)
+                print(word)
                 if word[max_probability] >= self.util_config["entities_threshold"]:
                     if self.entities[max_probability] != latest_entity:
                         predicted_entities[-1].append({
