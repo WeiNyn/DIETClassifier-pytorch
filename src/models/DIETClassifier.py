@@ -1,21 +1,50 @@
+from typing import List
+
 import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
-from transformers import BertForTokenClassification, BertPreTrainedModel
+
+from transformers import BertForTokenClassification, BertPreTrainedModel, BertModel
 from transformers.configuration_utils import PretrainedConfig
 
+from os import path
+import json
+
+
+class DIETClassifierConfig(PretrainedConfig):
+    def __init__(self, model: str, entities: List[str] = None, intents: List[str] = None):
+        super().__init__()
+        self.model = model
+        self.entities = entities
+        self.intents = intents
+        self.hidden_dropout_prob = None
+        self.hidden_size = None
 
 class DIETClassifier(BertPreTrainedModel):
-    def __init__(self, config: PretrainedConfig):
+    def __init__(self, config: DIETClassifierConfig):
         """
         Create DIETClassifier model
 
         :param config: config for model
         """
-        pretrained_model = BertForTokenClassification.from_pretrained(config.model)
-        config.update(pretrained_model.config.__dict__)
-        # pretrained_model.config.__dict__.update(config.__dict__)
-        # config = pretrained_model.config
+        if path.exists(config.model):
+            try:
+                json_config = json.load(open(f"{config.model}/config.json", "r"))
+            except Exception as ex:
+                raise RuntimeError(f"Cannot load configuration fil from {config.model} by error: {ex}")
+
+            try:
+                checkpoint = torch.load(f"{config.model}/pytorch_model.bin")
+            except Exception as ex:
+                raise RuntimeError(f"Cannot load model from {config.model} by error: {ex}")
+
+            pretrained_model = None
+            config = PretrainedConfig.from_dict(json_config)
+        else:
+            pretrained_model = BertForTokenClassification.from_pretrained(config.model)
+            checkpoint = None
+            config.update(pretrained_model.config.__dict__)
+
         super().__init__(config)
 
         self.entities_list = ["O"] + config.entities
@@ -23,12 +52,20 @@ class DIETClassifier(BertPreTrainedModel):
         self.intents_list = config.intents
         self.num_intents = len(self.intents_list)
 
-        self.bert = pretrained_model.bert
+        self.bert = BertModel(config, add_pooling_layer=False) if not pretrained_model else pretrained_model.bert
+
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
+
         self.entities_classifier = nn.Linear(config.hidden_size, self.num_entities)
         self.intents_classifier = nn.Linear(config.hidden_size, self.num_intents)
 
         self.init_weights()
+
+        if not pretrained_model:
+            try:
+                self.load_state_dict(checkpoint)
+            except Exception as ex:
+                raise  RuntimeError(f"Cannot load state dict from checkpoint by error: {ex}")
 
     def forward(
             self,
@@ -145,11 +182,11 @@ if __name__ == '__main__':
     df, entities_list, intents_list = make_dataframe(files)
     dataset = DIETClassifierDataset(dataframe=df, tokenizer=tokenizer, entities=entities_list, intents=intents_list)
 
-    config = PretrainedConfig.from_dict(dict(
+    config = DIETClassifierConfig(
         model="dslim/bert-base-NER",
         entities=entities_list,
         intents=intents_list
-    ))
+    )
     model = DIETClassifier(config=config)
 
     sentences = ["What if I'm late"]

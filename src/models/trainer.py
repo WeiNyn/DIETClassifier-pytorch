@@ -60,9 +60,8 @@ if __name__ == '__main__':
 
     from src.DataReader.DataReader import make_dataframe
     from src.DataReader.dataset import DIETClassifierDataset
-    from src.models.DIETClassifier import DIETClassifier
+    from src.models.DIETClassifier import DIETClassifier, DIETClassifierConfig
     from transformers import AutoTokenizer
-    from transformers.configuration_utils import PretrainedConfig
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
@@ -74,7 +73,7 @@ if __name__ == '__main__':
     print(f"ENTITIES_LIST: {entities_list}")
     dataset = DIETClassifierDataset(dataframe=df, tokenizer=tokenizer, entities=entities_list, intents=intents_list)
 
-    config = PretrainedConfig.from_dict(dict(model="dslim/bert-base-NER", entities=entities_list, intents=intents_list))
+    config = DIETClassifierConfig(model="dslim/bert-base-NER", entities=entities_list, intents=intents_list)
     model = DIETClassifier(config=config)
 
     sentences = ["What if I'm late"]

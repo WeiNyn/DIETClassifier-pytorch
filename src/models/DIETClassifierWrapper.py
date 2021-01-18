@@ -2,14 +2,13 @@ from typing import Union, Dict, List, Any, Tuple
 
 import torch
 import yaml
-from transformers import AutoTokenizer
-from transformers.configuration_utils import PretrainedConfig
+from transformers import BertTokenizerFast
 
-from src.models.DIETClassifier import DIETClassifier
+from src.models.DIETClassifier import DIETClassifier, DIETClassifierConfig
 
 
 class DIETClassifierWrapper:
-    def __init__(self, config: Union[Dict[str, str], str]):
+    def __init__(self, config: Union[Dict[str, Dict[str, Any]], str]):
         if isinstance(config, str):
             try:
                 f = open(config, "r")
@@ -30,19 +29,19 @@ class DIETClassifierWrapper:
                 "cpu")
 
         model_config_attributes = ["model", "intents", "entities"]
-        model_config_dict = {k: v for k, v in model_config_dict.items() if k in model_config_attributes}
+        # model_config_dict = {k: v for k, v in model_config_dict.items() if k in model_config_attributes}
 
         self.intents = model_config_dict["intents"]
-        self.entities = model_config_dict["entities"]
+        self.entities = ["O"] + model_config_dict["entities"]
 
-        self.model_config = PretrainedConfig.from_dict(model_config_dict)
+        self.model_config = DIETClassifierConfig(**{k: v for k, v in model_config_dict.items() if k in model_config_attributes})
 
         training_config_dict = config.get("training", None)
         if not training_config_dict:
             raise ValueError(f"Config file should have 'training' attribute")
 
         self.training_config = training_config_dict
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_config.model)
+        self.tokenizer = BertTokenizerFast.from_pretrained(model_config_dict["tokenizer"])
         self.model = DIETClassifier(config=self.model_config)
 
         self.model.to(self.device)
@@ -70,8 +69,8 @@ class DIETClassifierWrapper:
             sorted_sentence = sentence.clone()
             sorted_sentence, _ = torch.sort(sorted_sentence)
 
-            if sorted_sentence[0] >= self.util_config["intent_threshold"] and (
-                    sorted_sentence[0] - sorted_sentence[1]) >= self.util_config["ambiguous_threshold"]:
+            if sorted_sentence[-1] >= self.util_config["intent_threshold"] and (
+                    sorted_sentence[-1] - sorted_sentence[-2]) >= self.util_config["ambiguous_threshold"]:
                 max_probability = torch.argmax(sentence)
             else:
                 max_probability = -1
@@ -96,9 +95,7 @@ class DIETClassifierWrapper:
             latest_entity = None
             for word, token_offset in zip(sentence, offset[1:]):
                 max_probability = torch.argmax(word)
-                print(max_probability)
-                print(word)
-                if word[max_probability] >= self.util_config["entities_threshold"]:
+                if word[max_probability] >= self.util_config["entities_threshold"] and max_probability != 0:
                     if self.entities[max_probability] != latest_entity:
                         predicted_entities[-1].append({
                             "entity_name": self.entities[max_probability],
@@ -112,7 +109,7 @@ class DIETClassifierWrapper:
 
         return predicted_entities
 
-    def predict(self, sentences: List[str]) -> Dict[str, Any]:
+    def predict(self, sentences: List[str]) -> List[Dict[str, Any]]:
         inputs, offset_mapping = self.tokenize(sentences=sentences)
         outputs = self.model(**inputs)
         logits = outputs["logits"]
@@ -125,3 +122,7 @@ class DIETClassifierWrapper:
             predicted_outputs[-1].update({"entities": entities_sentence})
 
         return predicted_outputs
+
+    def save_pretrained(self, directory: str):
+        self.model.save_pretrained(directory)
+        self.tokenizer.save_pretrained(directory)
