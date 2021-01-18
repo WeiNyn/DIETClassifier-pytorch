@@ -158,6 +158,11 @@ class DIETClassifierWrapper:
 
 
 if __name__ == "__main__":
+    import os
+    import sys
+
+    sys.path.append(os.getcwd())
+
     config_file = "src/config.yml"
 
     wrapper = DIETClassifierWrapper(config=config_file)
