@@ -5,6 +5,11 @@ import torch
 import yaml
 from transformers import BertTokenizerFast
 
+import os
+import sys
+
+sys.path.append(os.getcwd())
+
 from src.models.DIETClassifier import DIETClassifier, DIETClassifierConfig
 from src.models.trainer import DIETTrainer
 from src.DataReader.dataset import DIETClassifierDataset
@@ -136,7 +141,7 @@ class DIETClassifierWrapper:
         if not path.exists(dataset_folder):
             raise ValueError(f"Folder {dataset_folder} is not exists")
 
-        files_list = [f for f in listdir(dataset_folder) if path.isfile(path.join(dataset_folder, f))]
+        files_list = [path.join(dataset_folder, f) for f in listdir(dataset_folder) if path.isfile(path.join(dataset_folder, f)) and f.endswith(".yml")]
 
         df, _, _ = make_dataframe(files=files_list)
 
@@ -158,11 +163,6 @@ class DIETClassifierWrapper:
 
 
 if __name__ == "__main__":
-    import os
-    import sys
-
-    sys.path.append(os.getcwd())
-
     config_file = "src/config.yml"
 
     wrapper = DIETClassifierWrapper(config=config_file)

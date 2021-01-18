@@ -43,7 +43,8 @@ class DIETClassifier(BertPreTrainedModel):
         else:
             pretrained_model = BertForTokenClassification.from_pretrained(config.model)
             checkpoint = None
-            config.update(pretrained_model.config.__dict__)
+            pretrained_model.config.update(config.__dict__)
+            config = pretrained_model.config
 
         super().__init__(config)
 
