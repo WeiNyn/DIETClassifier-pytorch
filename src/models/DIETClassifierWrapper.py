@@ -1,3 +1,4 @@
+from os import path, listdir
 from typing import Union, Dict, List, Any, Tuple
 
 import torch
@@ -5,6 +6,9 @@ import yaml
 from transformers import BertTokenizerFast
 
 from src.models.DIETClassifier import DIETClassifier, DIETClassifierConfig
+from src.models.trainer import DIETTrainer
+from src.DataReader.dataset import DIETClassifierDataset
+from src.DataReader.DataReader import make_dataframe
 
 
 class DIETClassifierWrapper:
@@ -126,3 +130,42 @@ class DIETClassifierWrapper:
     def save_pretrained(self, directory: str):
         self.model.save_pretrained(directory)
         self.tokenizer.save_pretrained(directory)
+
+    def train_model(self, save_name: str = "latest_model"):
+        dataset_folder = self.dataset_config["dataset_folder"]
+        if not path.exists(dataset_folder):
+            raise ValueError(f"Folder {dataset_folder} is not exists")
+
+        files_list = [f for f in listdir(dataset_folder) if path.isfile(path.join(dataset_folder, f))]
+
+        df, _, _ = make_dataframe(files=files_list)
+
+        dataset = DIETClassifierDataset(dataframe=df, tokenizer=self.tokenizer, entities=self.entities, intents=self.intents)
+
+        trainer = DIETTrainer(model=self.model, dataset=dataset,
+                              train_range=self.training_config["train_range"],
+                              num_train_epochs=self.training_config["num_train_epochs"],
+                              per_device_train_batch_size=self.training_config["per_device_train_batch_size"],
+                              per_device_eval_batch_size=self.training_config["per_device_eval_batch_size"],
+                              warmup_steps=self.training_config["warmup_steps"],
+                              weight_decay=self.training_config["weight_decay"],
+                              logging_dir=self.training_config["logging_dir"],
+                              early_stopping_patience=self.training_config["early_stopping_patience"],
+                              early_stopping_threshold=self.training_config["early_stopping_threshold"],
+                              output_dir=self.training_config["output_dir"])
+
+        self.save_pretrained(save_name)
+
+
+if __name__ == "__main__":
+    config_file = "src/config.yml"
+
+    wrapper = DIETClassifierWrapper(config=config_file)
+
+    print(wrapper.predict(["What is the average working hours"]))
+
+    wrapper.train_model()
+
+    print(wrapper.predict(["What is the average working hours"]))
+
+

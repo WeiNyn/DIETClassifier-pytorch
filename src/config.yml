@@ -1,5 +1,5 @@
 model:
-  model: results/checkpoint-2673
+  model: dslim/bert-base-NER
   tokenizer: dslim/bert-base-NER
   dataset_folder: Dataset
   exclude_file: null
