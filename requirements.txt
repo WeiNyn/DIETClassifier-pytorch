@@ -1,0 +1,6 @@
+fastapi==0.63.0
+pandas==1.2.0
+PyYAML==5.3.1
+torch==1.7.0
+transformers==4.2.1
+uvicorn==0.13.3
