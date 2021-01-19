@@ -12,8 +12,8 @@ sys.path.append(os.getcwd())
 
 from src.models.classifier import DIETClassifier, DIETClassifierConfig
 from src.models.trainer import DIETTrainer
-from src.DataReader.dataset import DIETClassifierDataset
-from src.DataReader.DataReader import make_dataframe
+from src.data_reader.dataset import DIETClassifierDataset
+from src.data_reader.data_reader import make_dataframe
 
 
 class DIETClassifierWrapper:

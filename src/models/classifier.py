@@ -176,8 +176,8 @@ if __name__ == '__main__':
 
     sys.path.append(os.getcwd())
 
-    from src.DataReader.DataReader import make_dataframe
-    from src.DataReader.dataset import DIETClassifierDataset
+    from src.data_reader.data_reader import make_dataframe
+    from src.data_reader.dataset import DIETClassifierDataset
     from transformers import AutoTokenizer
 
     files = ["dataset/nlu_QnA_converted.yml", "dataset/nlu_QnA_converted.yml"]

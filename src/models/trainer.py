@@ -58,8 +58,8 @@ if __name__ == '__main__':
 
     sys.path.append(os.getcwd())
 
-    from src.DataReader.DataReader import make_dataframe
-    from src.DataReader.dataset import DIETClassifierDataset
+    from src.data_reader.data_reader import make_dataframe
+    from src.data_reader.dataset import DIETClassifierDataset
     from src.models.classifier import DIETClassifier, DIETClassifierConfig
     from transformers import AutoTokenizer
 
