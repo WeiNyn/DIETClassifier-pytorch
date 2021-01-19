@@ -17,7 +17,13 @@ from src.data_reader.data_reader import make_dataframe
 
 
 class DIETClassifierWrapper:
+    """Wrapper for DIETClassifier."""
     def __init__(self, config: Union[Dict[str, Dict[str, Any]], str]):
+        """
+        Create wrapper with configuration.
+
+        :param config: config in dictionary format or path to config file (.yml)
+        """
         if isinstance(config, str):
             try:
                 f = open(config, "r")
@@ -58,6 +64,11 @@ class DIETClassifierWrapper:
         self.softmax = torch.nn.Softmax(dim=-1)
 
     def tokenize(self, sentences) -> Tuple[Dict[str, Any], List[List[Tuple[int, int]]]]:
+        """
+        Tokenize sentences using tokenizer.
+        :param sentences: list of sentences
+        :return: tuple(tokenized sentences, offset_mapping for sentences)
+        """
         inputs = self.tokenizer(sentences, return_tensors="pt", return_attention_mask=True, return_token_type_ids=True,
                                 return_offsets_mapping=True,
                                 padding=True, truncation=True)
@@ -68,6 +79,12 @@ class DIETClassifierWrapper:
         return inputs, offset_mapping
 
     def convert_intent_logits(self, intent_logits: torch.tensor) -> List[Dict[str, float]]:
+        """
+        Convert logits from model to predicted intent,
+
+        :param intent_logits: output from model
+        :return: dictionary of predicted intent
+        """
         softmax_intents = self.softmax(intent_logits)
 
         predicted_intents = []
@@ -87,7 +104,7 @@ class DIETClassifierWrapper:
             predicted_intents.append({
                 "intent": None if max_probability == -1 else self.intents[max_probability],
                 "intent_ranking": {
-                    intent_name: probability for intent_name, probability in zip(self.intents, sentence)
+                    intent_name: probability.item() for intent_name, probability in zip(self.intents, sentence)
                 }
             })
 
@@ -95,6 +112,13 @@ class DIETClassifierWrapper:
 
     def convert_entities_logits(self, entities_logits: torch.tensor, offset_mapping: torch.tensor) -> List[
         List[Dict[str, Any]]]:
+        """
+        Convert logits to predicted entities
+
+        :param entities_logits: entities logits from model
+        :param offset_mapping: offset mapping for sentences
+        :return: list of predicted entities
+        """
         softmax_entities = self.softmax(entities_logits)
 
         predicted_entities = []
@@ -108,17 +132,23 @@ class DIETClassifierWrapper:
                     if self.entities[max_probability] != latest_entity:
                         predicted_entities[-1].append({
                             "entity_name": self.entities[max_probability],
-                            "start": token_offset[0],
-                            "end": token_offset[1]
+                            "start": token_offset[0].item(),
+                            "end": token_offset[1].item()
                         })
                     else:
-                        predicted_entities[-1][-1]["end"] = token_offset[1]
+                        predicted_entities[-1][-1]["end"] = token_offset[1].item()
                 else:
                     latest_entity = None
 
         return predicted_entities
 
     def predict(self, sentences: List[str]) -> List[Dict[str, Any]]:
+        """
+        Predict intent and entities from sentences.
+
+        :param sentences: list of sentences
+        :return: list of prediction
+        """
         inputs, offset_mapping = self.tokenize(sentences=sentences)
         outputs = self.model(**inputs)
         logits = outputs["logits"]
@@ -133,10 +163,21 @@ class DIETClassifierWrapper:
         return predicted_outputs
 
     def save_pretrained(self, directory: str):
+        """
+        Save model and tokenizer to directory
+
+        :param directory: path to save folder
+        :return: None
+        """
         self.model.save_pretrained(directory)
         self.tokenizer.save_pretrained(directory)
 
     def train_model(self, save_folder: str = "latest_model"):
+        """
+        Create trainer, train and save best model to save_folder
+        :param save_folder: path to save folder
+        :return: None
+        """
         dataset_folder = self.dataset_config["dataset_folder"]
         if not path.exists(dataset_folder):
             raise ValueError(f"Folder {dataset_folder} is not exists")
