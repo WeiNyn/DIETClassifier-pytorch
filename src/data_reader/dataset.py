@@ -8,7 +8,7 @@ import torch
 class DIETClassifierDataset:
     def __init__(self, dataframe: pd.DataFrame, tokenizer, entities: List[str], intents: List[str]):
         """
-        Dataset for DIETClassifier
+        dataset for DIETClassifier
 
         :param dataframe: dataframe contains ["example", "intent", "entities"] columns
         :param tokenizer: tokenizer from transformers
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     from src.DataReader.DataReader import make_dataframe
     from transformers import AutoTokenizer
 
-    files = ["Dataset/nlu_QnA_converted.yml", "Dataset/nlu_QnA_converted.yml"]
+    files = ["dataset/nlu_QnA_converted.yml", "dataset/nlu_QnA_converted.yml"]
     tokenizer = AutoTokenizer.from_pretrained("dslim/bert-base-NER")
 
     df, entities_list, intents_list = make_dataframe(files)

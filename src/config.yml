@@ -1,7 +1,7 @@
 model:
   model: dslim/bert-base-NER
   tokenizer: dslim/bert-base-NER
-  dataset_folder: Dataset
+  dataset_folder: dataset
   exclude_file: null
   entities:
     - working_type
@@ -36,8 +36,8 @@ training:
   warmup_steps: 500
   weight_decay: 0.01
   logging_dir: logs/
-  early_stopping_patience: 20
-  early_stopping_threshold: 0.00001
+  early_stopping_patience: 10
+  early_stopping_threshold: 0.0001
   output_dir: results/
 util:
   intent_threshold: 0.7

@@ -10,7 +10,7 @@ import sys
 
 sys.path.append(os.getcwd())
 
-from src.models.DIETClassifier import DIETClassifier, DIETClassifierConfig
+from src.models.classifier import DIETClassifier, DIETClassifierConfig
 from src.models.trainer import DIETTrainer
 from src.DataReader.dataset import DIETClassifierDataset
 from src.DataReader.DataReader import make_dataframe

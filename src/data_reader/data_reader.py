@@ -187,7 +187,7 @@ if __name__ == '__main__':
 
     sys.path.append(os.getcwd())
 
-    files = ["Dataset/nlu_QnA_converted.yml", "Dataset/nlu_QnA_converted.yml"]
+    files = ["dataset/nlu_QnA_converted.yml", "dataset/nlu_QnA_converted.yml"]
 
     df, entities_list, intents_list = make_dataframe(files)
     print(df.head(20))

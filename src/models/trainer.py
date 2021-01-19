@@ -60,12 +60,12 @@ if __name__ == '__main__':
 
     from src.DataReader.DataReader import make_dataframe
     from src.DataReader.dataset import DIETClassifierDataset
-    from src.models.DIETClassifier import DIETClassifier, DIETClassifierConfig
+    from src.models.classifier import DIETClassifier, DIETClassifierConfig
     from transformers import AutoTokenizer
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-    files = ["Dataset/nlu_QnA_converted.yml", "Dataset/nlu_QnA_converted.yml"]
+    files = ["dataset/nlu_QnA_converted.yml", "dataset/nlu_QnA_converted.yml"]
     tokenizer = AutoTokenizer.from_pretrained("dslim/bert-base-NER")
 
     df, entities_list, intents_list = make_dataframe(files)
