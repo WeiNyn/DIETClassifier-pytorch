@@ -29,8 +29,10 @@ class DIETClassifierWrapper:
                 f = open(config, "r")
             except Exception as ex:
                 raise RuntimeError(f"Cannot read config file from {config}: {ex}")
+            self.config_file_path = config
             config = yaml.load(f)
 
+        self.config = config
         self.util_config = config.get("util", None)
 
         model_config_dict = config.get("model", None)
@@ -63,7 +65,7 @@ class DIETClassifierWrapper:
 
         self.softmax = torch.nn.Softmax(dim=-1)
 
-        self.synonym_dict = dict()
+        self.synonym_dict = {} if not model_config_dict.get("synonym") else model_config_dict["synonym"]
 
     def tokenize(self, sentences) -> Tuple[Dict[str, Any], List[List[Tuple[int, int]]]]:
         """
@@ -182,6 +184,15 @@ class DIETClassifierWrapper:
         """
         self.model.save_pretrained(directory)
         self.tokenizer.save_pretrained(directory)
+
+        config_file_path = "config.yml" if not self.config_file_path else self.config_file_path
+
+        try:
+            f = open(config_file_path, "w")
+            yaml.dump(self.config, f, sort_keys=False)
+            f.close()
+        except Exception as ex:
+            raise RuntimeError(f"Cannot save config to {config_file_path} by error: {ex}")
 
     def train_model(self, save_folder: str = "latest_model"):
         """
