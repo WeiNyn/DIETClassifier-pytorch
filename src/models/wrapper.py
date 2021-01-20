@@ -63,6 +63,8 @@ class DIETClassifierWrapper:
 
         self.softmax = torch.nn.Softmax(dim=-1)
 
+        self.synonym_dict = dict()
+
     def tokenize(self, sentences) -> Tuple[Dict[str, Any], List[List[Tuple[int, int]]]]:
         """
         Tokenize sentences using tokenizer.
@@ -130,6 +132,7 @@ class DIETClassifierWrapper:
                 max_probability = torch.argmax(word)
                 if word[max_probability] >= self.util_config["entities_threshold"] and max_probability != 0:
                     if self.entities[max_probability] != latest_entity:
+                        latest_entity = self.entities[max_probability]
                         predicted_entities[-1].append({
                             "entity_name": self.entities[max_probability],
                             "start": token_offset[0].item(),
@@ -155,10 +158,18 @@ class DIETClassifierWrapper:
         predicted_intents = self.convert_intent_logits(intent_logits=logits[1])
         predicted_entities = self.convert_entities_logits(entities_logits=logits[0], offset_mapping=offset_mapping)
         predicted_outputs = []
-        for intent_sentence, entities_sentence in zip(predicted_intents, predicted_entities):
+        for sentence, intent_sentence, entities_sentence in zip(sentences, predicted_intents, predicted_entities):
             predicted_outputs.append({})
             predicted_outputs[-1].update(intent_sentence)
             predicted_outputs[-1].update({"entities": entities_sentence})
+            for entity in predicted_outputs[-1]["entities"]:
+                entity["text"] = sentence[entity["start"]: entity["end"]]
+
+                if self.synonym_dict.get(entity["text"], None):
+                    entity["original_text"] = entity["text"]
+                    entity["text"] = self.synonym_dict[entity["text"]]
+
+            predicted_outputs[-1]["text"] = sentence
 
         return predicted_outputs
 
@@ -184,7 +195,9 @@ class DIETClassifierWrapper:
 
         files_list = [path.join(dataset_folder, f) for f in listdir(dataset_folder) if path.isfile(path.join(dataset_folder, f)) and f.endswith(".yml")]
 
-        df, _, _ = make_dataframe(files=files_list)
+        df, _, _, synonym_dict = make_dataframe(files=files_list)
+
+        self.synonym_dict.update(synonym_dict)
 
         dataset = DIETClassifierDataset(dataframe=df, tokenizer=self.tokenizer, entities=self.entities[1:], intents=self.intents)
 
@@ -210,7 +223,7 @@ if __name__ == "__main__":
 
     wrapper = DIETClassifierWrapper(config=config_file)
 
-    print(wrapper.predict(["What is the average working hours"]))
+    print(wrapper.predict(["I work on office hours"]))
 
     wrapper.train_model()
 

@@ -13,15 +13,16 @@ SYNONYM_REGEX = "\[[\w+\s*]+\]\{.+\}"
 DATA_REGEX = "\{.+\}"
 
 
-def make_dataframe(files: List[str]) -> Tuple[pd.DataFrame, List[str], List[str]]:
+def make_dataframe(files: List[str]) -> Tuple[pd.DataFrame, List[str], List[str], Dict[str, str]]:
     """
     Make data frame for DIETClassifier dataset from files list
 
     :param files: list of files location
-    :return: tuple(dataframe, list of entities class name, list of intent class name)
+    :return: tuple(dataframe, list of entities class name, list of intent class name, synonym dictionary)
     """
 
     data = []
+    synonym_dict = {}
     for file in files:
         data += read_from_yaml(file=file)
 
@@ -29,6 +30,19 @@ def make_dataframe(files: List[str]) -> Tuple[pd.DataFrame, List[str], List[str]
 
     for intent in data:
         if not intent.get("intent", None):
+            if intent.get("synonym", None):
+                target_entity = intent["synonym"]
+
+                entities_list_text = intent["examples"]
+                if entities_list_text[:2] == "- ":
+                    entities_list_text = entities_list_text[2:]
+                if entities_list_text[-1:] == "\n":
+                    entities_list_text = entities_list_text[:-1]
+
+                synonym_entities_list = entities_list_text.split("\n- ")
+                for entity in synonym_entities_list:
+                    synonym_dict[entity] = target_entity
+
             continue
 
         intent_name = intent["intent"]
@@ -50,7 +64,9 @@ def make_dataframe(files: List[str]) -> Tuple[pd.DataFrame, List[str], List[str]
         df = df.append(pd.DataFrame(data=new_data), ignore_index=True)
 
     df = get_entity(df=df)
-    df = get_entity_with_synonym(df=df)
+    df, updated_synonym_dict = get_entity_with_synonym(df=df)
+
+    synonym_dict.update(updated_synonym_dict)
 
     entities_list = []
     intents_list = []
@@ -70,7 +86,7 @@ def make_dataframe(files: List[str]) -> Tuple[pd.DataFrame, List[str], List[str]
         if row["intent"] not in intents_list:
             intents_list.append(row["intent"])
 
-    return df, entities_list, intents_list
+    return df, entities_list, intents_list, synonym_dict
 
 
 def read_from_yaml(file: str) -> List[Dict[str, str]]:
@@ -126,13 +142,14 @@ def get_entity(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_entity_with_synonym(df: pd.DataFrame) -> pd.DataFrame:
+def get_entity_with_synonym(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, str]]:
     """
     Extract entities with synonym in dataframe.
 
     :param df: dataframe to process
-    :return: processed dataframe
+    :return: tuple(processed dataframe, synonym dictionary)
     """
+    synonym_dict = {}
     for _, row in df.iterrows():
         entity_data = row["entities"]
         if not entity_data:
@@ -176,9 +193,11 @@ def get_entity_with_synonym(df: pd.DataFrame) -> pd.DataFrame:
                 synonym=synonym_value
             ))
 
+            synonym_dict[synonym_value] = entity_text
+
         row["entities"] = entity_data
 
-    return df
+    return df, synonym_dict
 
 
 if __name__ == '__main__':
@@ -189,7 +208,8 @@ if __name__ == '__main__':
 
     files = ["dataset/nlu_QnA_converted.yml", "dataset/nlu_QnA_converted.yml"]
 
-    df, entities_list, intents_list = make_dataframe(files)
+    df, entities_list, intents_list, synonym_dict = make_dataframe(files)
     print(df.head(20))
     print(entities_list)
     print(intents_list)
+    print(synonym_dict)

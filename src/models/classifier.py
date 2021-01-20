@@ -183,7 +183,7 @@ if __name__ == '__main__':
     files = ["dataset/nlu_QnA_converted.yml", "dataset/nlu_QnA_converted.yml"]
     tokenizer = AutoTokenizer.from_pretrained("dslim/bert-base-NER")
 
-    df, entities_list, intents_list = make_dataframe(files)
+    df, entities_list, intents_list, synonym_dict = make_dataframe(files)
     dataset = DIETClassifierDataset(dataframe=df, tokenizer=tokenizer, entities=entities_list, intents=intents_list)
 
     config = DIETClassifierConfig(
