@@ -209,7 +209,7 @@ class DIETClassifierWrapper:
         df, _, _, synonym_dict = make_dataframe(files=files_list)
 
         self.synonym_dict.update(synonym_dict)
-        self.config["model"]["synonym"].update(synonym_dict)
+        self.config["model"]["synonym"] = self.synonym_dict
 
         dataset = DIETClassifierDataset(dataframe=df, tokenizer=self.tokenizer, entities=self.entities[1:], intents=self.intents)
 
