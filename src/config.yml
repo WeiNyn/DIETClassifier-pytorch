@@ -4,30 +4,38 @@ model:
   dataset_folder: dataset
   exclude_file: null
   entities:
-    - working_type
-    - shift_type
+  - working_type
+  - shift_type
   intents:
-    - WorkTimesBreaches
-    - WorkingTimeBreachDiscipline
-    - HolidaysOff
-    - AnnualLeaveApplicationProcess
-    - SetWorkingType
-    - TemporarySetWorkingType
-    - WorkingHours
-    - WorkingDay
-    - BreakTime
-    - Pregnant
-    - AttendanceRecord
-    - SelectShiftType
-    - LaborContract
-    - Recruitment
-    - SickLeave
-    - UnpaidLeave
-    - PaidLeaveForFamilyEvent
-    - UnusedAnnualLeave
-    - RegulatedAnnualLeave
-    - rating
+  - WorkTimesBreaches
+  - WorkingTimeBreachDiscipline
+  - HolidaysOff
+  - AnnualLeaveApplicationProcess
+  - SetWorkingType
+  - TemporarySetWorkingType
+  - WorkingHours
+  - WorkingDay
+  - BreakTime
+  - Pregnant
+  - AttendanceRecord
+  - SelectShiftType
+  - LaborContract
+  - Recruitment
+  - SickLeave
+  - UnpaidLeave
+  - PaidLeaveForFamilyEvent
+  - UnusedAnnualLeave
+  - RegulatedAnnualLeave
+  - rating
+  - greet
+  - goodbye
+  - affirm
+  - deny
   device: cuda
+  synonym:
+    office hour: office hours
+    office: office hours
+    office hours: office hour
 training:
   train_range: 0.95
   num_train_epochs: 100

@@ -91,6 +91,7 @@ util:
 | exclude_file | files in folder that will not be used to train |
 | entities | list of entities |
 | intents | list of intents |
+| synonym | synonym list for synonym entities |
 | device | device to use ("cpu", "cuda", "cuda:0", etc) |
 | train_range | range to split dataset into train and valid set |
 | num_train_epochs | number of training epochs |
