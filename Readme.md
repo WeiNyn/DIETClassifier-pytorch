@@ -134,6 +134,7 @@ model = DIETClassifier(config=config)
 * This DIETClassifier using BERT base as the base architect, if you want to change to RoBerta, ALBert, etc. You need to modify the DIETClassifier Class.
 * You can also use any BERT base pretrained from Huggingface transformers for creating and fine tune yourself
 * Please read the source code to understand how the dataset be created in case that you want to make dataset in another file format.
+* If you get the error: AttributeError: """'NoneType' object has no attribute 'detach'""", please check the issue #5
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
